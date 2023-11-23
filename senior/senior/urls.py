@@ -19,12 +19,13 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from django.contrib import admin
 from rest_framework_simplejwt.views import TokenObtainPairView
-from togyzkumalak.views import register
+from togyzkumalak.views import register, get_my_data
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("login/", TokenObtainPairView.as_view(), name="login"),
     path("token/refresh/", TokenRefreshView.as_view(), name="refresh-token"),
     path("token/verify/", TokenVerifyView.as_view(), name="verify-token"),
-    path('register/', register, name='register')
+    path('register/', register, name='register'),
+    path('my_data/', get_my_data, name='get_my_data')
 ]
