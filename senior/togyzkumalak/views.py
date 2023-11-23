@@ -1,10 +1,22 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, ListUserDataSerializer
+from .serializers import RegisterSerializer, ListUserDataSerializer, GameSessionSerializer, GameHistorySerializer
 from django.contrib.auth.models import User
+from .models import GameHistory, GameSession
+
+
+class GameSessionViewsets(viewsets.ModelViewSet):
+    queryset = GameSession.objects.all()
+    serializer_class = GameSessionSerializer
+    http_method_names = ['get', 'post']
+
+class GameHistoryViewsets(viewsets.ModelViewSet):
+    queryset = GameHistory.objects.all()
+    serializer_class = GameHistorySerializer
+    http_method_names = ['get', 'post']
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

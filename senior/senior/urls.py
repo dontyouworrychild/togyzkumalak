@@ -20,6 +20,8 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from django.contrib import admin
 from rest_framework_simplejwt.views import TokenObtainPairView
 from togyzkumalak.views import register, get_my_data
+from django.urls import include
+from togyzkumalak.views import GameHistory, GameSession
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +29,6 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="refresh-token"),
     path("token/verify/", TokenVerifyView.as_view(), name="verify-token"),
     path('register/', register, name='register'),
-    path('my_data/', get_my_data, name='get_my_data')
+    path('my_data/', get_my_data, name='get_my_data'),
+    path('games/', include("togyzkumalak.urls")),
 ]

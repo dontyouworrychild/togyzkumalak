@@ -3,7 +3,19 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
+from .models import GameHistory, GameSession
 
+
+class GameSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameSession
+        fields = ('id', 'user')
+
+
+class GameHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameHistory
+        fields = ('id', 'game_session', 'pits', 'kazan', 'tuzdyq')
 
 class RegisterSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True)
