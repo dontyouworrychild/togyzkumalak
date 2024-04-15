@@ -12,6 +12,16 @@ class GameSessionViewsets(viewsets.ModelViewSet):
     queryset = GameSession.objects.all()
     serializer_class = GameSessionSerializer
     http_method_names = ['get', 'post']
+    
+    def get_permissions(self):
+        permission_classes = [AllowAny]
+        if self.action in ['create']:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)    
+    
 
 class GameHistoryViewsets(viewsets.ModelViewSet):
     queryset = GameHistory.objects.all()

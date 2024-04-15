@@ -39,10 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'togyzkumalak.apps.TogyzkumalakConfig',
+    # 'stats.apps.StatsConfig',
+    'channels',
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt'
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -82,6 +93,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'senior.wsgi.application'
+ASGI_APPLICATION = "senior.routing.application"
 
 
 # Database

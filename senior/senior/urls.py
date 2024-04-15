@@ -21,6 +21,8 @@ from django.contrib import admin
 from rest_framework_simplejwt.views import TokenObtainPairView
 from togyzkumalak.views import register, get_my_data
 from django.urls import include
+from django.conf.urls.static import static
+from django.conf import settings
 from togyzkumalak.views import GameHistory, GameSession
 
 urlpatterns = [
@@ -31,4 +33,4 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('my_data/', get_my_data, name='get_my_data'),
     path('games/', include("togyzkumalak.urls")),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
