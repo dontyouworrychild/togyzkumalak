@@ -11,13 +11,13 @@ def image_directory_path(instance, filename):
 class User(AbstractUser):
     image = models.ImageField(upload_to=image_directory_path, blank=True, null=True)
     
-    class Meta:
-        verbose_name = _("user")
-        verbose_name_plural = _("users")
+    # class Meta:
+    #     verbose_name = _("user")
+    #     verbose_name_plural = _("users")
         # ordering = ("-created_at",)
 
-    def __str__(self) -> str:
-        return f"{self.username}"
+    # def __str__(self) -> str:
+    #     return f"{self.username}"
     
     def delete_image(self):
         if self.image:
