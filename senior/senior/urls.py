@@ -34,4 +34,4 @@ urlpatterns = [
     path('my_data/', get_my_data, name='get_my_data'),
     path('games/', include("togyzkumalak.urls")),
     path('users/', include("users.urls")),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
