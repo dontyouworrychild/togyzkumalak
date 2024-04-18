@@ -3,19 +3,26 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-from .models import GameHistory, GameSession
+from .models import GameHistory, GameSession, Bot
 
+# class BotSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Bot
+#         # fields = ('id', 'name', 'difficulty_level')
+#         fields = "__all__"
 
 class GameSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameSession
-        fields = ('id', 'user')
+        # fields = ('id', 'user')
+        fields = "__all__"
 
 
 class GameHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = GameHistory
-        fields = ('id', 'game_session', 'pits', 'kazan', 'tuzdyq')
+        # fields = ('id', 'game_session', 'pits', 'kazan', 'tuzdyq')
+        fields = "__all__"
 
 class RegisterSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True)
@@ -26,6 +33,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'password', 'password2', 'first_name', 'last_name') 
+        # fields = "__all__"
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -49,3 +57,4 @@ class ListUserDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name') 
+        # fields = "__all__"
