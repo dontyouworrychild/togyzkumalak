@@ -4,13 +4,17 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-from .models import GameHistory, GameSession, Bot
+from .models import GameHistory, GameSession, Bot, Queue
 
 # class BotSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Bot
 #         # fields = ('id', 'name', 'difficulty_level')
 #         fields = "__all__"
+class QueueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Queue
+        fields = "__all__"
 
 class GameSessionSerializer(serializers.ModelSerializer):
     class Meta:

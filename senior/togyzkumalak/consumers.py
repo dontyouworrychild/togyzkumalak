@@ -25,3 +25,22 @@ class GameConsumer(AsyncWebsocketConsumer):
             return await self.get_object_or_404(GameSession, id=self.game_session_id)
         except GameSession.DoesNotExist:
             return None
+
+class QueueConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        # Add this channel to a group to receive match notifications
+        await self.channel_layer.group_add("matchmaking", self.channel_name)
+
+    async def disconnect(self, close_code):
+        # Remove this channel from the matchmaking group
+        await self.channel_layer.group_discard("matchmaking", self.channel_name)
+
+    # Receive a message from the group
+    async def match_notification(self, event):
+        # Send a message to WebSocket
+        await self.send(text_data=json.dumps({
+            'type': 'match.found',
+            'game_session': event['game_session']
+        }))
+

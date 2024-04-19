@@ -4,11 +4,52 @@ from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, ListUserDataSerializer, GameSessionSerializer, GameHistorySerializer
+from .serializers import RegisterSerializer, ListUserDataSerializer, GameSessionSerializer, GameHistorySerializer, QueueSerializer
 from django.contrib.auth.models import User
-from .models import GameHistory, GameSession
+from .models import GameHistory, GameSession, Queue
 from .app import ai
+from django.db import transaction
+from rest_framework.decorators import action
 
+
+class QueueViewSet(viewsets.ModelViewSet):
+    queryset = Queue.objects.all()
+    serializer_class = QueueSerializer
+    http_method_names = ['get', 'post', 'delete']
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['post'], url_name='match_user')
+    def match_user(self, request):
+        # Get the user from the request user or payload
+        requesting_user = request.user
+        
+        with transaction.atomic():  # Use a transaction to ensure atomicity
+            # Check if there's another user in the queue
+            try:
+                other_user_queue = Queue.objects.exclude(user=requesting_user).select_for_update().first()
+            except Queue.DoesNotExist:
+                return Response({'error': 'No other users in queue'}, status=status.HTTP_404_NOT_FOUND)
+
+            if other_user_queue is not None:
+                # Create a new GameSession
+                game_session = GameSession.objects.create(
+                    first_user=requesting_user,
+                    second_user=other_user_queue.user
+                )
+
+                # Delete the other user's queue entry
+                other_user_queue.delete()
+
+                # You may want to delete the requesting user's queue as well
+                Queue.objects.filter(user=requesting_user).delete()
+
+                # Return the created game session details
+                game_session_serializer = GameSessionSerializer(game_session)
+                return Response(game_session_serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                # If no match was found, optionally add the user to the queue
+                Queue.objects.get_or_create(user=requesting_user)
+                return Response({'status': 'You are added to the queue and waiting for a match.'}, status=status.HTTP_200_OK)
 
 class GameSessionViewsets(viewsets.ModelViewSet):
     queryset = GameSession.objects.all()
