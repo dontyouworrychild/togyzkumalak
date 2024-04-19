@@ -5,7 +5,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+    command: daphne -p 8000 senior.asgi:application
     volumes:
       - ./senior:/senior
       - static:/static
@@ -13,6 +13,7 @@ services:
       - "80:8000"
     depends_on:
       - db
+      - redis
     env_file:
       - ./.env.dev
 

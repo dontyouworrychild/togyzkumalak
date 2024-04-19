@@ -14,8 +14,15 @@
 
 
 from django.urls import re_path
-from .consumers import QueueConsumer
+# from .consumers import QueueConsumer
+
+# websocket_urlpatterns = [
+#     re_path(r'ws/matchmaking/', QueueConsumer.as_asgi()),
+# ]
+
+from .consumers import GameConsumer, QueueConsumer
 
 websocket_urlpatterns = [
     re_path(r'ws/matchmaking/$', QueueConsumer.as_asgi()),
+    re_path(r'ws/game/(?P<game_session_id>\d+)/$', GameConsumer.as_asgi()),
 ]

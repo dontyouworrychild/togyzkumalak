@@ -93,8 +93,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'senior.wsgi.application'
-ASGI_APPLICATION = "senior.routing.application"
+# WSGI_APPLICATION = 'senior.wsgi.application'
+ASGI_APPLICATION = "senior.asgi.application"
 
 
 # Database

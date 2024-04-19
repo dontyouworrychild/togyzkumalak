@@ -26,21 +26,54 @@ class GameConsumer(AsyncWebsocketConsumer):
         except GameSession.DoesNotExist:
             return None
 
-class QueueConsumer(AsyncWebsocketConsumer):
+from channels.generic.websocket import AsyncWebsocketConsumer
+import json
+from asgiref.sync import sync_to_async
+from .models import Queue, GameSession  # Replace with your actual app name and models
+from .serializers import GameSessionSerializer  # Replace with your actual app name and serializers
+
+class QueueConsumer(AsyncWebsocketConsumer):    
     async def connect(self):
-        await self.accept()
-        # Add this channel to a group to receive match notifications
-        await self.channel_layer.group_add("matchmaking", self.channel_name)
+        self.user = self.scope['user']
+        
+        if self.user.is_authenticated:
+            # Accept the WebSocket connection
+            await self.accept()
+            
+            # You might want to add the user to the matchmaking queue here
+            await sync_to_async(Queue.objects.get_or_create)(user=self.user)
+            
+            # Add the user to the group to receive notifications
+            await self.channel_layer.group_add("matchmaking", self.channel_name)
+        else:
+            # Reject the connection if the user is not authenticated
+            await self.close()
 
     async def disconnect(self, close_code):
-        # Remove this channel from the matchmaking group
+        # Leave the matchmaking group
         await self.channel_layer.group_discard("matchmaking", self.channel_name)
+        
+        # You might want to remove the user from the matchmaking queue here
+        await sync_to_async(Queue.objects.filter(user=self.user).delete)()
 
-    # Receive a message from the group
+    # Custom handler for match_notification events
     async def match_notification(self, event):
-        # Send a message to WebSocket
+        # Send the match notification to the WebSocket
         await self.send(text_data=json.dumps({
             'type': 'match.found',
             'game_session': event['game_session']
         }))
-
+    
+    async def receive(self, text_data):
+        # You can handle received data from the WebSocket here if needed
+        text_data_json = json.loads(text_data)
+        action = text_data_json.get('action')
+        
+        if action == 'join_queue':
+            # Add user to the matchmaking queue
+            await sync_to_async(Queue.objects.get_or_create)(user=self.user)
+            await self.send(text_data=json.dumps({'status': 'You joined the matchmaking queue.'}))
+        elif action == 'leave_queue':
+            # Remove user from the matchmaking queue
+            await sync_to_async(Queue.objects.filter(user=self.user).delete)()
+            await self.send(text_data=json.dumps({'status': 'You left the matchmaking queue.'}))
